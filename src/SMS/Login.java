@@ -2,8 +2,6 @@ package SMS;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.*;
@@ -121,34 +119,30 @@ public class Login {
         login.setBackground(Color.decode("#DEE4E7"));
         login.setForeground(Color.decode("#37474F"));
         frame.add(login);
-        login.addActionListener(new ActionListener() {
-            @SuppressWarnings("deprecation")
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    int res = dbCheck(username.getText(), password.getText());
-                    if(res == 0) {
-                        warning.setText("NO USER FOUND!!!");
-                        username.setText("");
-                        password.setText("");
-                    }
-                    else if(res == -1) {
-                        warning.setText("WRONG PASSWORD!!!");
-                        username.setText("");
-                        password.setText("");
-                    }
-                    else {
-                        if(res == 1)
-                            hm.homeView(usr);
-                        else if(res == 2)
-                            tview.tcView(usr);
-                        else if (res == 3)
-                            sview.stView(usr);
-                        frame.dispose();
-                    }
-                } catch (SQLException e1) {
-                    e1.printStackTrace();
+        login.addActionListener(e -> {
+            try {
+                int res = dbCheck(username.getText(), password.getText());
+                if(res == 0) {
+                    warning.setText("NO USER FOUND!!!");
+                    username.setText("");
+                    password.setText("");
                 }
+                else if(res == -1) {
+                    warning.setText("WRONG PASSWORD!!!");
+                    username.setText("");
+                    password.setText("");
+                }
+                else {
+                    if(res == 1)
+                        hm.homeView(usr);
+                    else if(res == 2)
+                        tview.tcView(usr);
+                    else if (res == 3)
+                        sview.stView(usr);
+                    frame.dispose();
+                }
+            } catch (SQLException e1) {
+                e1.printStackTrace();
             }
         });
         //----------------------------------------------------------
