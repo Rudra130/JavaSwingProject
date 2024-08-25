@@ -1,4 +1,4 @@
-package SMS;
+package Attendance;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -8,19 +8,22 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.*;
+import java.sql.Connection;
 
-public class Admin {
+public class Students {
     DefaultTableModel model = new DefaultTableModel();
-    Font text = new Font("Times New Roman", Font.PLAIN, 18);
     Connection con;
     int check;
     JButton edit;
     JButton delete;
     JButton add;
 
-    public void adminView() throws NumberFormatException, SQLException {
-        JFrame frame = new JFrame();
+    public void studentView() throws SQLException {
+
+        Font text = new Font("Times New Roman", Font.PLAIN, 18);
         Font btn = new Font("Times New Roman", Font.BOLD, 20);
+
+        JFrame frame = new JFrame();
 
         //------------------------CLOSE---------------------------
         JLabel x = new JLabel("X");
@@ -89,8 +92,22 @@ public class Admin {
         idbox.setFont(text);
         idbox.setForeground(Color.decode("#37474F"));
         idbox.setEditable(false);
+        idbox.setText(String.valueOf(getid()));
         frame.add(idbox);
         //--------------------------------------------------------
+
+        //--------------------CLASS---------------------------------
+        JLabel classes = new JLabel("CLASS : ");
+        classes.setFont(text);
+        classes.setBounds(250, 60, 100, 20);
+        classes.setForeground(Color.decode("#DEE4E7"));
+        frame.add(classes);
+        @SuppressWarnings("unchecked")
+        JComboBox clss= new JComboBox(classEt());
+        clss.setBounds(350, 60, 50, 25);
+        clss.setEnabled(false);
+        frame.add(clss);
+        //------------------------------------------------------------
 
         //---------------------USERNAME-------------------------
         JLabel user = new JLabel("USERNAME : ");
@@ -150,7 +167,7 @@ public class Admin {
             public void actionPerformed(ActionEvent e) {
                 if(check == 1) {
                     try {
-                        adder(Integer.parseInt(idbox.getText()), username.getText(), name.getText(), password.getText());
+                        adder(Integer.parseInt(idbox.getText()), username.getText(), name.getText(), password.getText(), String.valueOf(clss.getSelectedItem()));
                     }
                     catch (SQLException e1) {
                         e1.printStackTrace();
@@ -160,9 +177,9 @@ public class Admin {
                     save.setEnabled(false);
                     try {
                         if(password.getText().equals(""))
-                            editor(Integer.parseInt(idbox.getText()), username.getText(), name.getText());
+                            editor(Integer.parseInt(idbox.getText()), username.getText(), name.getText(), String.valueOf(clss.getSelectedItem()));
                         else
-                            editor(Integer.parseInt(idbox.getText()), username.getText(), name.getText(), password.getText());
+                            editor(Integer.parseInt(idbox.getText()), username.getText(), name.getText(), password.getText(), String.valueOf(clss.getSelectedItem()));
                     }
                     catch (SQLException e1) {
                         e1.printStackTrace();
@@ -202,6 +219,7 @@ public class Admin {
                 username.setEditable(true);
                 name.setEditable(true);
                 password.setEditable(true);
+                clss.setEnabled(true);
             }
         });
         //-------------------------------------------------------
@@ -222,6 +240,7 @@ public class Admin {
                 username.setEditable(true);
                 name.setEditable(true);
                 password.setEditable(true);
+                clss.setEnabled(true);
                 check = 1;
                 try {
                     idbox.setText(String.valueOf(getid()));
@@ -246,6 +265,7 @@ public class Admin {
                 username.setEditable(false);
                 name.setEditable(false);
                 password.setEditable(false);
+                clss.setEnabled(false);
                 edit.setEnabled(false);
                 add.setEnabled(true);
                 try {
@@ -277,9 +297,11 @@ public class Admin {
                 edit.setEnabled(true);
                 username.setEditable(false);
                 password.setEditable(false);
+                clss.setEnabled(false);
                 name.setEditable(false);
                 save.setEnabled(false);
                 delete.setEnabled(true);
+                add.setEnabled(true);
             }
         });
         //-------------------------------------------------------------
@@ -311,18 +333,6 @@ public class Admin {
         }
     }
 
-    public ResultSet dbSearch() throws SQLException {
-        //ENTER PORT, USER, PASSWORD.
-        String str1 = "SELECT * FROM user WHERE prio = 1";
-        String url = "jdbc:mysql://localhost:3306/student";
-        String user = "root";
-        String pass = "eptest$00";
-        con = DriverManager.getConnection(url, user, pass);
-        Statement stm = con.createStatement();
-        ResultSet rst = stm.executeQuery(str1);
-        return rst;
-    }
-
     public int getid() throws SQLException {
         Statement stm = con.createStatement();
         ResultSet rst = stm.executeQuery("SELECT MAX(id) from user");
@@ -334,25 +344,58 @@ public class Admin {
         }
     }
 
-    public void adder(int id, String user, String name, String password) throws SQLException {
-        String adding = "insert into user values ("+id+", '"+user+"', '"+name+"', '"+password+"', 1)";
+    public ResultSet dbSearch() throws SQLException {
+        //ENTER PORT, USER, PASSWORD.
+        String str1 = "SELECT user.id, user.username, students.name FROM user, students where user.id = students.id";
+        String url = "jdbc:mysql://localhost:3306/student";
+        String user = "root";
+        String pass = "eptest$00";
+        con = DriverManager.getConnection(url, user, pass);
+        Statement stm = con.createStatement();
+        ResultSet rst = stm.executeQuery(str1);
+        return rst;
+    }
+
+    public void adder(int id, String user, String name, String password, String classes) throws SQLException {
+        String adding = "insert into user values ("+id+", '"+user+"', '"+name+"', '"+password+"', 3)";
+        String adding2 = "insert into students values ("+id+", '"+name+"', '"+classes+"')";
         Statement stm = con.createStatement();
         stm.executeUpdate(adding);
+        stm.executeUpdate(adding2);
     }
 
     public void deleter(int id) throws SQLException {
-        String del = "DELETE FROM user WHERE id = "+id;
+        String del = "DELETE FROM students WHERE id = "+id;
+        String del2 = "DELETE FROM user WHERE id = "+id;
         Statement stm = con.createStatement();
         stm.executeUpdate(del);
+        stm.executeUpdate(del2);
     }
-    public void editor(int id, String username, String name, String password) throws SQLException {
+    public void editor(int id, String username, String name, String password, String classes) throws SQLException {
         String update = "UPDATE user SET username = '"+username+"', name = '"+name+"', password = '"+password+"'WHERE id = "+id;
+        String update2 = "UPDATE students SET name = '"+name+"', class = '"+classes+"' WHERE id = "+id;
         Statement stm = con.createStatement();
         stm.executeUpdate(update);
+        stm.executeUpdate(update2);
     }
-    public void editor(int id, String username, String name) throws SQLException {
-        String update = "UPDATE user SET username = '" + username + "', name = '" + name + "' WHERE id = " + id;
+    public void editor(int id, String username, String name, String classes) throws SQLException {
+        String update = "UPDATE user SET username = '"+username+"', name = '"+name+"' WHERE id = "+id;
+        String update2 = "UPDATE students SET name = '"+name+"', class = '"+classes+"' WHERE id = "+id;
         Statement stm = con.createStatement();
         stm.executeUpdate(update);
+        stm.executeUpdate(update2);
+    }
+
+    public String[] classEt() throws SQLException {
+        String str1 = "SELECT name from class";
+        Statement stm = con.createStatement();
+        ResultSet rst = stm.executeQuery(str1);
+        String[] rt = new String[25];
+        int i=0;
+        while(rst.next()) {
+            rt[i] = rst.getString("name");
+            i++;
+        }
+        return rt;
     }
 }

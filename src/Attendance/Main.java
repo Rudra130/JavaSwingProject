@@ -1,4 +1,4 @@
-package SMS;
+package Attendance;
 
 public class Main
 {

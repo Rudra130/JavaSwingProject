@@ -1,4 +1,4 @@
-package SMS;
+package Attendance;
 
 import javax.swing.*;
 import java.awt.*;

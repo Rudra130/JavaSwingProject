@@ -1,4 +1,4 @@
-package SMS;
+package Attendance;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,11 +8,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.*;
 
-public class TeacherView {
-    public void tcView(int id) throws SQLException {
-
+public class Home {
+    public void homeView(int id) throws SQLException {
         JFrame frame = new JFrame();
         Font btn = new Font("Times New Roman", Font.BOLD, 20);
+        Admin adm = new Admin();
 
         //------------------------CLOSE---------------------------
         JLabel x = new JLabel("X");
@@ -56,9 +56,30 @@ public class TeacherView {
         frame.add(welcome);
         //-----------------------------------------------------------
 
+        //----------------------STUDENTS----------------------------
+        JButton students = new JButton("STUDENTS");
+        students.setBounds(150, 125, 700, 60);
+        students.setFont(btn);
+        students.setBackground(Color.decode("#DEE4E7"));
+        students.setForeground(Color.decode("#37474F"));
+        frame.add(students);
+        students.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Students std = new Students();
+                try {
+                    std.studentView();
+                } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+        //----------------------------------------------------------
+
         //----------------------ADDATTENDANCE----------------------------
         JButton addattendance = new JButton("ADD ATTENDANCE");
-        addattendance.setBounds(150, 200, 650, 60);
+        addattendance.setBounds(150, 250, 400, 60);
         addattendance.setFont(btn);
         addattendance.setBackground(Color.decode("#DEE4E7"));
         addattendance.setForeground(Color.decode("#37474F"));
@@ -78,7 +99,7 @@ public class TeacherView {
 
         //----------------------EDITATTENDANCE----------------------------
         JButton editattendance = new JButton("EDIT ATTENDANCE");
-        editattendance.setBounds(150, 350, 650, 60);
+        editattendance.setBounds(600, 250, 250, 60);
         editattendance.setFont(btn);
         editattendance.setBackground(Color.decode("#DEE4E7"));
         editattendance.setForeground(Color.decode("#37474F"));
@@ -92,6 +113,62 @@ public class TeacherView {
                 } catch (SQLException e1) {
                     e1.printStackTrace();
                 }
+            }
+        });
+        //----------------------------------------------------------
+
+        //----------------------TEACHERS----------------------------
+        JButton teacher = new JButton("TEACHERS");
+        teacher.setBounds(150, 375, 700, 60);
+        teacher.setFont(new Font("Times New Roman", Font.BOLD, 20));
+        teacher.setBackground(Color.decode("#DEE4E7"));
+        teacher.setForeground(Color.decode("#37474F"));
+        frame.add(teacher);
+        teacher.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Teachers teacher = new Teachers();
+                try {
+                    teacher.teachersView();
+                } catch (SQLException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+        //----------------------------------------------------------
+
+        //----------------------USER----------------------------
+        JButton admin = new JButton("ADMIN");
+        admin.setBounds(150, 500, 250, 60);
+        admin.setFont(new Font("Times New Roman", Font.BOLD, 20));
+        admin.setBackground(Color.decode("#DEE4E7"));
+        admin.setForeground(Color.decode("#37474F"));
+        frame.add(admin);
+        admin.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    adm.adminView();
+                }
+                catch (SQLException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+        //----------------------------------------------------------
+
+        //----------------------CLASS----------------------------
+        JButton classes = new JButton("CLASS");
+        classes.setBounds(450, 500, 400, 60);
+        classes.setFont(new Font("Times New Roman", Font.BOLD, 20));
+        classes.setBackground(Color.decode("#DEE4E7"));
+        classes.setForeground(Color.decode("#37474F"));
+        frame.add(classes);
+        classes.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Class classroom = new Class();
+                classroom.classView();
             }
         });
         //----------------------------------------------------------

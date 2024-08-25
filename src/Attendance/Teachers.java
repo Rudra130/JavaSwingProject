@@ -1,4 +1,4 @@
-package SMS;
+package Attendance;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -8,9 +8,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.*;
-import java.sql.Connection;
 
-public class Students {
+public class Teachers {
+
     DefaultTableModel model = new DefaultTableModel();
     Connection con;
     int check;
@@ -18,7 +18,7 @@ public class Students {
     JButton delete;
     JButton add;
 
-    public void studentView() throws SQLException {
+    public void teachersView() throws SQLException {
 
         Font text = new Font("Times New Roman", Font.PLAIN, 18);
         Font btn = new Font("Times New Roman", Font.BOLD, 20);
@@ -96,19 +96,6 @@ public class Students {
         frame.add(idbox);
         //--------------------------------------------------------
 
-        //--------------------CLASS---------------------------------
-        JLabel classes = new JLabel("CLASS : ");
-        classes.setFont(text);
-        classes.setBounds(250, 60, 100, 20);
-        classes.setForeground(Color.decode("#DEE4E7"));
-        frame.add(classes);
-        @SuppressWarnings("unchecked")
-        JComboBox clss= new JComboBox(classEt());
-        clss.setBounds(350, 60, 50, 25);
-        clss.setEnabled(false);
-        frame.add(clss);
-        //------------------------------------------------------------
-
         //---------------------USERNAME-------------------------
         JLabel user = new JLabel("USERNAME : ");
         user.setFont(text);
@@ -167,7 +154,7 @@ public class Students {
             public void actionPerformed(ActionEvent e) {
                 if(check == 1) {
                     try {
-                        adder(Integer.parseInt(idbox.getText()), username.getText(), name.getText(), password.getText(), String.valueOf(clss.getSelectedItem()));
+                        adder(Integer.parseInt(idbox.getText()), username.getText(), name.getText(), password.getText());
                     }
                     catch (SQLException e1) {
                         e1.printStackTrace();
@@ -177,9 +164,9 @@ public class Students {
                     save.setEnabled(false);
                     try {
                         if(password.getText().equals(""))
-                            editor(Integer.parseInt(idbox.getText()), username.getText(), name.getText(), String.valueOf(clss.getSelectedItem()));
+                            editor(Integer.parseInt(idbox.getText()), username.getText(), name.getText());
                         else
-                            editor(Integer.parseInt(idbox.getText()), username.getText(), name.getText(), password.getText(), String.valueOf(clss.getSelectedItem()));
+                            editor(Integer.parseInt(idbox.getText()), username.getText(), name.getText(), password.getText());
                     }
                     catch (SQLException e1) {
                         e1.printStackTrace();
@@ -219,7 +206,6 @@ public class Students {
                 username.setEditable(true);
                 name.setEditable(true);
                 password.setEditable(true);
-                clss.setEnabled(true);
             }
         });
         //-------------------------------------------------------
@@ -240,7 +226,6 @@ public class Students {
                 username.setEditable(true);
                 name.setEditable(true);
                 password.setEditable(true);
-                clss.setEnabled(true);
                 check = 1;
                 try {
                     idbox.setText(String.valueOf(getid()));
@@ -265,7 +250,6 @@ public class Students {
                 username.setEditable(false);
                 name.setEditable(false);
                 password.setEditable(false);
-                clss.setEnabled(false);
                 edit.setEnabled(false);
                 add.setEnabled(true);
                 try {
@@ -297,11 +281,9 @@ public class Students {
                 edit.setEnabled(true);
                 username.setEditable(false);
                 password.setEditable(false);
-                clss.setEnabled(false);
                 name.setEditable(false);
                 save.setEnabled(false);
                 delete.setEnabled(true);
-                add.setEnabled(true);
             }
         });
         //-------------------------------------------------------------
@@ -346,7 +328,7 @@ public class Students {
 
     public ResultSet dbSearch() throws SQLException {
         //ENTER PORT, USER, PASSWORD.
-        String str1 = "SELECT user.id, user.username, students.name FROM user, students where user.id = students.id";
+        String str1 = "SELECT user.id, user.username, teachers.name FROM user, teachers where user.id = teachers.id";
         String url = "jdbc:mysql://localhost:3306/student";
         String user = "root";
         String pass = "eptest$00";
@@ -356,46 +338,34 @@ public class Students {
         return rst;
     }
 
-    public void adder(int id, String user, String name, String password, String classes) throws SQLException {
-        String adding = "insert into user values ("+id+", '"+user+"', '"+name+"', '"+password+"', 3)";
-        String adding2 = "insert into students values ("+id+", '"+name+"', '"+classes+"')";
+    public void adder(int id, String user, String name, String password) throws SQLException {
+        String adding = "insert into user values ("+id+", '"+user+"', '"+name+"', '"+password+"', 2)";
+        String adding2 = "insert into teachers values ("+id+", '"+name+"')";
         Statement stm = con.createStatement();
         stm.executeUpdate(adding);
         stm.executeUpdate(adding2);
     }
 
     public void deleter(int id) throws SQLException {
-        String del = "DELETE FROM students WHERE id = "+id;
+        String del = "DELETE FROM teachers WHERE id = "+id;
         String del2 = "DELETE FROM user WHERE id = "+id;
         Statement stm = con.createStatement();
         stm.executeUpdate(del);
         stm.executeUpdate(del2);
     }
-    public void editor(int id, String username, String name, String password, String classes) throws SQLException {
+    public void editor(int id, String username, String name, String password) throws SQLException {
         String update = "UPDATE user SET username = '"+username+"', name = '"+name+"', password = '"+password+"'WHERE id = "+id;
-        String update2 = "UPDATE students SET name = '"+name+"', class = '"+classes+"' WHERE id = "+id;
+        String update2 = "UPDATE teachers SET name = '"+name+"' WHERE id = "+id;
         Statement stm = con.createStatement();
         stm.executeUpdate(update);
         stm.executeUpdate(update2);
     }
-    public void editor(int id, String username, String name, String classes) throws SQLException {
+    public void editor(int id, String username, String name) throws SQLException {
         String update = "UPDATE user SET username = '"+username+"', name = '"+name+"' WHERE id = "+id;
-        String update2 = "UPDATE students SET name = '"+name+"', class = '"+classes+"' WHERE id = "+id;
+        String update2 = "UPDATE teachers SET name = '"+name+"' WHERE id = "+id;
         Statement stm = con.createStatement();
         stm.executeUpdate(update);
         stm.executeUpdate(update2);
     }
 
-    public String[] classEt() throws SQLException {
-        String str1 = "SELECT name from class";
-        Statement stm = con.createStatement();
-        ResultSet rst = stm.executeQuery(str1);
-        String[] rt = new String[25];
-        int i=0;
-        while(rst.next()) {
-            rt[i] = rst.getString("name");
-            i++;
-        }
-        return rt;
-    }
 }
