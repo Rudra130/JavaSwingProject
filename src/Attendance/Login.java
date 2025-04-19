@@ -161,25 +161,31 @@ public class Login {
     }
 
     public int dbCheck(String name, String password) throws SQLException {
-        //ENTER PORT, USER, PASSWORD.
         String url = "jdbc:mysql://localhost:3306/student";
         String user = "root";
         String pass = "eptest$00";
-        String str = "SELECT * FROM user WHERE username = '" + name + "'";
-        Connection con = DriverManager.getConnection(url, user, pass);
-        Statement stm = con.createStatement();
-        ResultSet rst = stm.executeQuery(str);
-        if(rst.next()) {
-            if(rst.getString("password").equals(password)) {
-                usr = rst.getInt("id");
-                return rst.getInt("prio");
+        String query = "SELECT * FROM user WHERE username = ?";
+
+        try (
+                Connection con = DriverManager.getConnection(url, user, pass);
+                PreparedStatement pst = con.prepareStatement(query);
+        ) {
+            pst.setString(1, name);
+            ResultSet rst = pst.executeQuery();
+
+            if (rst.next()) {
+                String storedPassword = rst.getString("password");
+                if (storedPassword.equals(password)) {
+                    usr = rst.getInt("id");
+                    return rst.getInt("role");
+                } else {
+                    return -1; // Incorrect password
+                }
+            } else {
+                return 0; // Username not found
             }
-            else
-                return -1;
-        }
-        else {
-            return 0;
         }
     }
+
 
 }

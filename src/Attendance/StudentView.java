@@ -140,17 +140,23 @@ public class StudentView {
         String user = "root";
         String pass = "eptest$00";
         con = DriverManager.getConnection(url, user, pass);
-        String str = "SELECT name FROM user WHERE id = "+id;
-        Statement stm = con.createStatement();
-        ResultSet rst = stm.executeQuery(str);
-        rst.next();
-        return rst.getString("name");
+
+        String str = "SELECT name FROM student WHERE id = ?";
+        PreparedStatement pst = con.prepareStatement(str);
+        pst.setInt(1, id);
+        ResultSet rst = pst.executeQuery();
+
+        if (rst.next()) {
+            return rst.getString("name");
+        } else {
+            return null;  // Handle case where no user found
+        }
     }
 
     public void tblupdt(int id) {
         try {
             ResultSet res = dbSearch(id);
-            for(int i=0; res.next(); i++) {
+            for (int i = 0; res.next(); i++) {
                 model.addRow(new Object[0]);
                 model.setValueAt(res.getString("dt"), i, 0);
                 model.setValueAt(res.getString("status"), i, 1);
@@ -161,26 +167,40 @@ public class StudentView {
     }
 
     public int[] stat(int id) throws SQLException {
-        String str = "SELECT COUNT(*) AS pre FROM attend WHERE stid = "+id+" AND status = 'Present'";
-        String str2 = "SELECT COUNT(*) AS abs FROM attend WHERE stid = "+id+" AND status = 'Absent'";
+        String str = "SELECT COUNT(*) AS pre FROM attend WHERE id = ? AND status = 'Present'";
+        String str2 = "SELECT COUNT(*) AS abs FROM attend WHERE id = ? AND status = 'Absent'";
         int[] x = new int[4];
-        Statement stm = con.createStatement();
-        ResultSet rst = stm.executeQuery(str);
-        rst.next();
-        x[1] = rst.getInt("pre");
-        rst = stm.executeQuery(str2);
-        rst.next();
-        x[2] = rst.getInt("abs");
+
+        PreparedStatement pst = con.prepareStatement(str);
+        pst.setInt(1, id);
+        ResultSet rst = pst.executeQuery();
+        if (rst.next()) {
+            x[1] = rst.getInt("pre");
+        }
+
+        pst = con.prepareStatement(str2);
+        pst.setInt(1, id);
+        rst = pst.executeQuery();
+        if (rst.next()) {
+            x[2] = rst.getInt("abs");
+        }
+
         x[0] = x[1] + x[2];
-        x[3] = (x[1]*100)/x[0];
+        if (x[0] != 0) {
+            x[3] = (x[1] * 100) / x[0];  // Percentage of "Present"
+        } else {
+            x[3] = 0; // If no attendance records, set the percentage to 0
+        }
+
         tblupdt(id);
         return x;
     }
 
     public ResultSet dbSearch(int id) throws SQLException {
-        String str1 = "SELECT * from attend where stid = "+id+" ORDER BY dt desc";
-        Statement stm = con.createStatement();
-        ResultSet rst = stm.executeQuery(str1);
+        String str1 = "SELECT * FROM attend WHERE id = ? ORDER BY dt DESC";
+        PreparedStatement pst = con.prepareStatement(str1);
+        pst.setInt(1, id);
+        ResultSet rst = pst.executeQuery();
         return rst;
     }
 }

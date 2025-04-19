@@ -357,11 +357,31 @@ public class Students {
     }
 
     public void adder(int id, String user, String name, String password, String classes) throws SQLException {
-        String adding = "insert into user values ("+id+", '"+user+"', '"+name+"', '"+password+"', 3)";
-        String adding2 = "insert into students values ("+id+", '"+name+"', '"+classes+"')";
-        Statement stm = con.createStatement();
-        stm.executeUpdate(adding);
-        stm.executeUpdate(adding2);
+        // Insert into the 'user' table
+        String adding = "INSERT INTO user (id, username, name, password, role) VALUES (?, ?, ?, ?, 3)";
+
+        // Insert into the 'students' table
+        String adding2 = "INSERT INTO students (id, name, classes) VALUES (?, ?, ?)";
+
+        // Use PreparedStatement to prevent SQL injection
+        try (PreparedStatement stm1 = con.prepareStatement(adding);
+             PreparedStatement stm2 = con.prepareStatement(adding2)) {
+
+            // Set values for the 'user' table insert
+            stm1.setInt(1, id);
+            stm1.setString(2, user);
+            stm1.setString(3, name);
+            stm1.setString(4, password);
+
+            // Set values for the 'students' table insert
+            stm2.setInt(1, id);
+            stm2.setString(2, name);
+            stm2.setString(3, classes);
+
+            // Execute the insert statements
+            stm1.executeUpdate();
+            stm2.executeUpdate();
+        }
     }
 
     public void deleter(int id) throws SQLException {

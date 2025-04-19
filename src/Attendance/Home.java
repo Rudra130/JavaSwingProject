@@ -192,10 +192,10 @@ public class Home {
         String user = "root";
         String pass = "eptest$00";
         Connection con = DriverManager.getConnection(url, user, pass);
-        String str = "SELECT name FROM user WHERE id = "+id;
+        String str = "SELECT username FROM student WHERE id = " + id;
         Statement stm = con.createStatement();
         ResultSet rst = stm.executeQuery(str);
         rst.next();
-        return rst.getString("name");
+        return rst.getString("username");
     }
 }
